@@ -1,0 +1,99 @@
+version: '3'
+services:
+  chat:
+    image: rocketchat/rocket.chat:latest
+    ports:
+      - 3000:3000
+    environment:
+      - VIRTUAL_HOST=chat.badger.lan
+      - MONGO_URL=mongodb://mongo:27017/rocketchat
+      - MONGO_OPLOG_URL=mongodb://mongo:27017/local
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:4.0
+    command: mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
+    volumes:
+      - mongo_data:/data/db
+
+  netmap:
+    image: markmanx/isoflow:latest
+    ports:
+      - 3001:3001
+    environment:
+      - VIRTUAL_HOST=netmap.badger.lan
+    volumes:
+      - isoflow_data:/opt/isoflow/data
+
+  manager:
+    image: portainer/portainer-ce:latest
+    ports:
+      - 3002:3002
+    environment:
+      - VIRTUAL_HOST=manager.badger.lan
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  e1:
+    image: etherpad/etherpad:latest
+    ports:
+      - 9001:9001
+    environment:
+      - VIRTUAL_HOST=e1.badger.lan
+    volumes:
+      - e1_data:/opt/etherpad-lite/var
+
+  e2:
+    image: etherpad/etherpad:latest
+    ports:
+      - 9002:9002
+    environment:
+      - VIRTUAL_HOST=e2.badger.lan
+    volumes:
+      - e2_data:/opt/etherpad-lite/var
+
+  e3:
+    image: etherpad/etherpad:latest
+    ports:
+      - 9003:9003
+    environment:
+      - VIRTUAL_HOST=e3.badger.lan
+    volumes:
+      - e3_data:/opt/etherpad-lite/var
+
+  support:
+    image: etherpad/etherpad:latest
+    ports:
+      - 9004:9004
+    environment:
+      - VIRTUAL_HOST=support.badger.lan
+    volumes:
+      - support_data:/opt/etherpad-lite/var
+
+volumes:
+  e1_data:
+    driver: local
+    driver_opts:
+      size: "10GiB"
+  e2_data:
+    driver: local
+    driver_opts:
+      size: "10GiB"
+  e3_data:
+    driver: local
+    driver_opts:
+      size: "10GiB"
+  support_data:
+    driver: local
+    driver_opts:
+      size: "10GiB"
+  mongo_data:
+    driver: local
+  isoflow_data:
+    driver: local
+  portainer_data:
+    driver: local
+    
+    
