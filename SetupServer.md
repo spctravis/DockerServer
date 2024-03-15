@@ -337,3 +337,59 @@ sudo systemctl restart nginx
 
 Now, you can access each Etherpad instance at `http://E1.badger.lan`, `http://E2.badger.lan`, `http://E3.badger.lan`, and `http://support.badger.lan`.
 
+
+First, create a new directory for your markdown page and nginx configuration:
+
+```bash
+mkdir -p nginx/html
+```
+
+Then, create your markdown page in the `nginx/html` directory. Here's an example of what it might look like:
+
+```markdown
+# Services
+
+- [e1](http://e1.badger.lan)
+- [e2](http://e2.badger.lan)
+- [e3](http://e3.badger.lan)
+- [support](http://support.badger.lan)
+```
+
+Next, create an nginx configuration file in the `nginx` directory. Here's an example of what it might look like:
+
+```nginx
+server {
+    listen 80;
+    server_name badger.lan;
+
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+}
+```
+
+This configuration will serve the files in the `/usr/share/nginx/html` directory at `http://badger.lan`.
+
+Finally, add a new service to your `docker-compose.yml` file for the nginx server:
+
+```yaml
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+```
+
+This service will start an nginx server that serves your markdown page at `http://badger.lan`. The `volumes` directive maps the `nginx/html` directory on your host to the `/usr/share/nginx/html` directory in the container, and the `nginx/nginx.conf` file on your host to the `/etc/nginx/conf.d/default.conf` file in the container.
+
+Please note that you'll need to convert your markdown page to HTML for it to be served correctly by nginx. You can do this with a markdown converter like pandoc:
+
+```bash
+pandoc -s -o nginx/html/index.html nginx/html/index.md
+```
+
+This command will create an HTML file named `index.html` from your markdown file.

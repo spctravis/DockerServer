@@ -1,7 +1,8 @@
-version: '3'
+
 services:
   chat:
     image: rocketchat/rocket.chat:latest
+    restart: always
     ports:
       - 3000:3000
     environment:
@@ -12,13 +13,15 @@ services:
       - mongo
 
   mongo:
-    image: mongo:4.0
+    image: mongo:latest
+    restart: always
     command: mongod --smallfiles --oplogSize 128 --replSet rs0 --storageEngine=mmapv1
     volumes:
       - mongo_data:/data/db
 
   netmap:
     image: markmanx/isoflow:latest
+    restart: always
     ports:
       - 3001:3001
     environment:
@@ -28,16 +31,18 @@ services:
 
   manager:
     image: portainer/portainer-ce:latest
+    restart: always
     ports:
       - 3002:3002
     environment:
       - VIRTUAL_HOST=manager.badger.lan
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - portainer_data:/opt/portainer
 
   e1:
     image: etherpad/etherpad:latest
+    restart: always
     ports:
       - 9001:9001
     environment:
@@ -47,6 +52,7 @@ services:
 
   e2:
     image: etherpad/etherpad:latest
+    restart: always
     ports:
       - 9002:9002
     environment:
@@ -56,6 +62,7 @@ services:
 
   e3:
     image: etherpad/etherpad:latest
+    restart: always
     ports:
       - 9003:9003
     environment:
@@ -65,12 +72,22 @@ services:
 
   support:
     image: etherpad/etherpad:latest
+    restart: always
     ports:
       - 9004:9004
     environment:
       - VIRTUAL_HOST=support.badger.lan
     volumes:
       - support_data:/opt/etherpad-lite/var
+        
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ./nginx/html:/usr/share/nginx/html
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
 
 volumes:
   e1_data:
@@ -95,5 +112,5 @@ volumes:
     driver: local
   portainer_data:
     driver: local
-    
+
     

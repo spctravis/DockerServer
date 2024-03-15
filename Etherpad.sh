@@ -3,6 +3,9 @@
 # Pull the Etherpad Docker image
 docker pull etherpad/etherpad
 
+# Create directories for Etherpad
+mkdir -p /opt/etherpad-lite/var
+
 # Create Nginx configuration files for each Etherpad instance
 for i in {1..4}
 do

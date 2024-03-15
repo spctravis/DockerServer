@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Pull the latest Portainer image
-docker pull portainer/portainer-ce:latest
+# Create a directory for Portainer
+mkdir -p /opt/portainer
 
 # Create Nginx configuration file for Portainer
 echo "server {
