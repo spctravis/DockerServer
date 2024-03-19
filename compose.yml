@@ -56,6 +56,11 @@ services:
   manager:
     image: portainer/portainer-ce:latest
     restart: always
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.manager.rule: Host(`manager.badger.lan`)
+      traefik.http.routers.manager.entryPoints: web
+      traefik.http.services.manager.loadbalancer.server.port: 3002
     ports:
       - 3002:3002
     environment:
@@ -67,6 +72,11 @@ services:
   e1:
     image: etherpad/etherpad:latest
     restart: always
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.e1.rule: Host(`e1.badger.lan`)
+      traefik.http.routers.e1.entryPoints: web
+      traefik.http.services.e1.loadbalancer.server.port: 9001
     ports:
       - 9001:9001
     environment:
@@ -77,6 +87,11 @@ services:
   e2:
     image: etherpad/etherpad:latest
     restart: always
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.e2.rule: Host(`e2.badger.lan`)
+      traefik.http.routers.e2.entryPoints: web
+      traefik.http.services.e2.loadbalancer.server.port: 9002
     ports:
       - 9002:9002
     environment:
@@ -87,6 +102,11 @@ services:
   e3:
     image: etherpad/etherpad:latest
     restart: always
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.e3.rule: Host(`e1.badger.lan`)
+      traefik.http.routers.e3.entryPoints: web
+      traefik.http.services.e3.loadbalancer.server.port: 9003
     ports:
       - 9003:9003
     environment:
@@ -97,6 +117,11 @@ services:
   support:
     image: etherpad/etherpad:latest
     restart: always
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.support.rule: Host(`support.badger.lan`)
+      traefik.http.routers.support.entryPoints: web
+      traefik.http.services.support.loadbalancer.server.port: 9004
     ports:
       - 9004:9004
     environment:
