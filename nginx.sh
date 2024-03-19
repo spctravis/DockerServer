@@ -26,7 +26,7 @@ server {
     server_name badger.lan;
 
     location / {
-        root /usr/share/nginx/html;
+        root /opt/nginx/html;
         index index.html;
     }
 }
