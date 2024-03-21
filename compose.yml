@@ -9,6 +9,7 @@ services:
       traefik.http.routers.rocketchat.tls: "true"
       traefik.http.routers.rocketchat.entrypoints: https
       traefik.http.routers.rocketchat.tls.certresolver: le
+      traefik.http.services.rocketchat.loadbalancer.server.scheme: https
     environment:
       MONGO_URL: "${MONGO_URL:-\
         mongodb://${MONGODB_ADVERTISED_HOSTNAME:-mongodb}:${MONGODB_INITIAL_PRIMARY_PORT_NUMBER:-27017}/\
