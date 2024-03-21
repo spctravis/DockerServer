@@ -21,6 +21,13 @@ services:
       DEPLOY_METHOD: docker
       DEPLOY_PLATFORM: ${DEPLOY_PLATFORM:-}
       REG_TOKEN: ${REG_TOKEN:-}
+      INITIAL_USER: yes
+      ADMIN_USERNAME: admin
+      ADMIN_NAME: Admin
+      ADMIN_EMAIL: rodriq@localhost.com
+      ADMIN_PASS: P@55w0rd
+      OVERWRITE_SETTING_Show_Setup_Wizard: completed
+      MAIL_URL: smtp://smtp.email
     depends_on:
       - mongodb
     expose:
