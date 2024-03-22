@@ -6,10 +6,10 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.rocketchat.rule: Host(`chat.badger.lan`)
-#      traefik.http.routers.rocketchat.tls: "true"
+      traefik.http.routers.rocketchat.tls: "true"
       traefik.http.routers.rocketchat.entrypoints: web
-#      traefik.http.routers.rocketchat.tls.certresolver: le
-#      traefik.http.services.rocketchat.loadbalancer.server.scheme: https
+      traefik.http.routers.rocketchat.tls.certresolver: le
+      traefik.http.services.rocketchat.loadbalancer.server.scheme: https
     environment:
       MONGO_URL: "${MONGO_URL:-\
         mongodb://${MONGODB_ADVERTISED_HOSTNAME:-mongodb}:${MONGODB_INITIAL_PRIMARY_PORT_NUMBER:-27017}/\
@@ -154,17 +154,17 @@ services:
      - --providers.docker=true
      - --providers.docker.exposedbydefault=true
      - --entrypoints.web.address=:80
-#     - --entrypoints.web.http.redirections.entryPoint.to=https
-#     - --entrypoints.web.http.redirections.entryPoint.scheme=https
-#     - --entrypoints.https.address=:443
-#     - --certificatesresolvers.le.acme.tlschallenge=true
-#     - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL?need email for cert expiry notifications}
-#     - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+     - --entrypoints.web.http.redirections.entryPoint.to=https
+     - --entrypoints.web.http.redirections.entryPoint.scheme=https
+     - --entrypoints.https.address=:443
+     - --certificatesresolvers.le.acme.tlschallenge=true
+     - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL?need email for cert expiry notifications}
+     - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
     ports:
       - 80:80
       - 8080:8080
     volumes:
-#      - traefik:/letsencrypt:rw
+      - traefik:/letsencrypt:rw
       - /run/docker.sock:/var/run/docker.sock:ro
 volumes:
   e1_data:
