@@ -3,11 +3,11 @@ services:
   rocketchat:
     image: registry.rocket.chat/rocketchat/rocket.chat:${RELEASE:-latest}
     restart: always
-#    labels:
-#      traefik.enable: "true"
-#      traefik.http.routers.rocketchat.rule: Host(`${DOMAIN:-}`)
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.rocketchat.rule: Host(`chat.badger.lan`)
 #      traefik.http.routers.rocketchat.tls: "true"
-#      traefik.http.routers.rocketchat.entrypoints: https
+      traefik.http.routers.rocketchat.entrypoints: web
 #      traefik.http.routers.rocketchat.tls.certresolver: le
 #      traefik.http.services.rocketchat.loadbalancer.server.scheme: https
     environment:
@@ -68,7 +68,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.manager.rule: Host(`manager.badger.lan`)
       traefik.http.routers.manager.entryPoints: web
-      traefik.http.services.manager.loadbalancer.server.port: 3002
+#      traefik.http.services.manager.loadbalancer.server.port: 3002
     ports:
       - 3002:3002
     environment:
@@ -84,7 +84,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.e1.rule: Host(`e1.badger.lan`)
       traefik.http.routers.e1.entryPoints: web
-      traefik.http.services.e1.loadbalancer.server.port: 9001
+#      traefik.http.services.e1.loadbalancer.server.port: 9001
     ports:
       - 9001:9001
     environment:
@@ -99,7 +99,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.e2.rule: Host(`e2.badger.lan`)
       traefik.http.routers.e2.entryPoints: web
-      traefik.http.services.e2.loadbalancer.server.port: 9002
+#      traefik.http.services.e2.loadbalancer.server.port: 9002
     ports:
       - 9002:9002
     environment:
@@ -114,7 +114,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.e3.rule: Host(`e1.badger.lan`)
       traefik.http.routers.e3.entryPoints: web
-      traefik.http.services.e3.loadbalancer.server.port: 9003
+#      traefik.http.services.e3.loadbalancer.server.port: 9003
     ports:
       - 9003:9003
     environment:
@@ -129,7 +129,7 @@ services:
       traefik.enable: "true"
       traefik.http.routers.support.rule: Host(`support.badger.lan`)
       traefik.http.routers.support.entryPoints: web
-      traefik.http.services.support.loadbalancer.server.port: 9004
+#      traefik.http.services.support.loadbalancer.server.port: 9004
     ports:
       - 9004:9004
     environment:
@@ -150,21 +150,21 @@ services:
     image: docker.io/traefik:${TRAEFIK_RELEASE:-v2.9.8}
     restart: always
     command:
-     - --api.insecure=false
+     - --api.insecure=true
      - --providers.docker=true
-     - --providers.docker.exposedbydefault=false
+     - --providers.docker.exposedbydefault=true
      - --entrypoints.web.address=:80
-     - --entrypoints.web.http.redirections.entryPoint.to=https
-     - --entrypoints.web.http.redirections.entryPoint.scheme=https
-     - --entrypoints.https.address=:443
-     - --certificatesresolvers.le.acme.tlschallenge=true
-     - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL?need email for cert expiry notifications}
-     - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+#     - --entrypoints.web.http.redirections.entryPoint.to=https
+#     - --entrypoints.web.http.redirections.entryPoint.scheme=https
+#     - --entrypoints.https.address=:443
+#     - --certificatesresolvers.le.acme.tlschallenge=true
+#     - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL?need email for cert expiry notifications}
+#     - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
     ports:
       - 80:80
-      - 443:443
+      - 8080:8080
     volumes:
-      - traefik:/letsencrypt:rw
+#      - traefik:/letsencrypt:rw
       - /run/docker.sock:/var/run/docker.sock:ro
 volumes:
   e1_data:
