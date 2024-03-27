@@ -26,7 +26,7 @@ services:
       ADMIN_USERNAME: admin
       ADMIN_NAME: Admin
       ADMIN_EMAIL: rodriq@localhost.com
-      ADMIN_PASS: P@55w0rd
+      ADMIN_PASS: P@55w0rd!
       OVERWRITE_SETTING_Show_Setup_Wizard: completed
       MAIL_URL: smtp://smtp.email
     depends_on:
@@ -83,7 +83,8 @@ services:
     labels:
       traefik.enable: "true"
       traefik.http.routers.e1.rule: Host(`e1.badger.lan`)
-      traefik.http.routers.e1.entryPoints: web
+      traefik.http.routers.e1.entryPoints: websecure
+      traefik.http.routers.e3.tls.certresolver: le
 #      traefik.http.services.e1.loadbalancer.server.port: 9001
     ports:
       - 9001:9001
@@ -154,12 +155,12 @@ services:
      - --providers.docker=true
      - --providers.docker.exposedbydefault=true
      - --entrypoints.web.address=:80
-#     - --entrypoints.web.http.redirections.entryPoint.to=https
-#     - --entrypoints.web.http.redirections.entryPoint.scheme=https
+     - --entrypoints.web.http.redirections.entryPoint.to=https
+     - --entrypoints.web.http.redirections.entryPoint.scheme=https
      - --entrypoints.https.address=:443
-#     - --certificatesresolvers.le.acme.tlschallenge=true
-#     - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL?need email for cert expiry notifications}
-#     - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
+     - --certificatesresolvers.le.acme.tlschallenge=true
+     - --certificatesresolvers.le.acme.email=${LETSENCRYPT_EMAIL?need email for cert expiry notifications}
+     - --certificatesresolvers.le.acme.storage=/letsencrypt/acme.json
     ports:
       - 80:80
       - 8080:8080
