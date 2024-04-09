@@ -1,55 +1,62 @@
 
 services:
-  rocketchat:
-    image: registry.rocket.chat/rocketchat/rocket.chat:${RELEASE:-latest}
-    restart: always
-    labels:
-      traefik.enable: "true"
-      traefik.http.routers.rocketchat.rule: Host(`chat.badger.lan`)
-      traefik.http.routers.rocketchat.tls: "true"
-      traefik.http.routers.rocketchat.entrypoints: https
-      traefik.http.routers.rocketchat.tls.certresolver: le
-#      traefik.http.services.rocketchat.loadbalancer.server.scheme: https
-    environment:
-      MONGO_URL: "${MONGO_URL:-\
-        mongodb://${MONGODB_ADVERTISED_HOSTNAME:-mongodb}:${MONGODB_INITIAL_PRIMARY_PORT_NUMBER:-27017}/\
-        ${MONGODB_DATABASE:-rocketchat}?replicaSet=${MONGODB_REPLICA_SET_NAME:-rs0}}"
-      MONGO_OPLOG_URL: "${MONGO_OPLOG_URL:\
-        -mongodb://${MONGODB_ADVERTISED_HOSTNAME:-mongodb}:${MONGODB_INITIAL_PRIMARY_PORT_NUMBER:-27017}/\
-        local?replicaSet=${MONGODB_REPLICA_SET_NAME:-rs0}}"
-      ROOT_URL: ${ROOT_URL:-https://chat.badger.lan:${HOST_PORT:-3000}}
-      PORT: ${PORT:-3000}
-      DEPLOY_METHOD: docker
-      DEPLOY_PLATFORM: ${DEPLOY_PLATFORM:-}
-      REG_TOKEN: ${REG_TOKEN:-}
-      INITIAL_USER: yes
-      ADMIN_USERNAME: admin
-      ADMIN_NAME: Admin
-      ADMIN_EMAIL: rodriq@localhost.com
-      ADMIN_PASS: P@55w0rd!
-      OVERWRITE_SETTING_Show_Setup_Wizard: completed
-      MAIL_URL: smtp://smtp.email
-    depends_on:
-      - mongodb
-    expose:
-      - ${PORT:-3000}
-    ports:
-      - "${BIND_IP:-0.0.0.0}:${HOST_PORT:-3000}:${PORT:-3000}"
-
-  mongodb:
-    image: docker.io/bitnami/mongodb:${MONGODB_VERSION:-5.0}
-    restart: always
+  #Mattermost DB postgres
+  postgres:
+    image: postgres:${POSTGRES_IMAGE_TAG}
+    restart: ${RESTART_POLICY}
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 100
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /var/run/postgresql
     volumes:
-      - mongodb_data:/opt/mongodb
+      - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
     environment:
-      MONGODB_REPLICA_SET_MODE: primary
-      MONGODB_REPLICA_SET_NAME: ${MONGODB_REPLICA_SET_NAME:-rs0}
-      MONGODB_PORT_NUMBER: ${MONGODB_PORT_NUMBER:-27017}
-      MONGODB_INITIAL_PRIMARY_HOST: ${MONGODB_INITIAL_PRIMARY_HOST:-mongodb}
-      MONGODB_INITIAL_PRIMARY_PORT_NUMBER: ${MONGODB_INITIAL_PRIMARY_PORT_NUMBER:-27017}
-      MONGODB_ADVERTISED_HOSTNAME: ${MONGODB_ADVERTISED_HOSTNAME:-mongodb}
-      MONGODB_ENABLE_JOURNAL: ${MONGODB_ENABLE_JOURNAL:-true}
-      ALLOW_EMPTY_PASSWORD: ${ALLOW_EMPTY_PASSWORD:-yes}
+      # timezone inside container
+      - TZ
+
+      # necessary Postgres options/variables
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
+
+  mattermost:
+    depends_on:
+      - postgres
+    image: mattermost/${MATTERMOST_IMAGE}:${MATTERMOST_IMAGE_TAG}
+    restart: ${RESTART_POLICY}
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 200
+    read_only: ${MATTERMOST_CONTAINER_READONLY}
+    tmpfs:
+      - /tmp
+    volumes:
+      - ${MATTERMOST_CONFIG_PATH}:/mattermost/config:rw
+      - ${MATTERMOST_DATA_PATH}:/mattermost/data:rw
+      - ${MATTERMOST_LOGS_PATH}:/mattermost/logs:rw
+      - ${MATTERMOST_PLUGINS_PATH}:/mattermost/plugins:rw
+      - ${MATTERMOST_CLIENT_PLUGINS_PATH}:/mattermost/client/plugins:rw
+      - ${MATTERMOST_BLEVE_INDEXES_PATH}:/mattermost/bleve-indexes:rw
+      # When you want to use SSO with GitLab, you have to add the cert pki chain of GitLab inside Alpine
+      # to avoid Token request failed: certificate signed by unknown authority 
+      # (link: https://github.com/mattermost/mattermost-server/issues/13059 and https://github.com/mattermost/docker/issues/34)
+      # - ${GITLAB_PKI_CHAIN_PATH}:/etc/ssl/certs/pki_chain.pem:ro
+    environment:
+      # timezone inside container
+      - TZ
+
+      # necessary Mattermost options/variables (see env.example)
+      - MM_SQLSETTINGS_DRIVERNAME
+      - MM_SQLSETTINGS_DATASOURCE
+
+      # necessary for bleve
+      - MM_BLEVESETTINGS_INDEXDIR
+
+      # additional settings
+      - MM_SERVICESETTINGS_SITEURL
 
   # netmap:
   #  image: markmanx/isoflow:latest
@@ -63,7 +70,7 @@ services:
 
   manager:
     image: portainer/portainer-ce:latest
-    restart: always
+    restart: ${RESTART_POLICY}
     labels:
       traefik.enable: "true"
       traefik.http.routers.manager.rule: Host(`manager.badger.lan`)
@@ -79,7 +86,7 @@ services:
 
   e1:
     image: etherpad/etherpad:latest
-    restart: always
+    restart: ${RESTART_POLICY}
     labels:
       traefik.enable: "true"
       traefik.http.routers.e1.rule: Host(`e1.badger.lan`)
@@ -95,7 +102,7 @@ services:
 
   e2:
     image: etherpad/etherpad:latest
-    restart: always
+    restart: ${RESTART_POLICY}
     labels:
       traefik.enable: "true"
       traefik.http.routers.e2.rule: Host(`e2.badger.lan`)
@@ -110,7 +117,7 @@ services:
 
   e3:
     image: etherpad/etherpad:latest
-    restart: always
+    restart: ${RESTART_POLICY}
     labels:
       traefik.enable: "true"
       traefik.http.routers.e3.rule: Host(`e1.badger.lan`)
@@ -125,7 +132,7 @@ services:
 
   support:
     image: etherpad/etherpad:latest
-    restart: always
+    restart: ${RESTART_POLICY}
     labels:
       traefik.enable: "true"
       traefik.http.routers.support.rule: Host(`support.badger.lan`)
@@ -149,7 +156,7 @@ services:
 
   traefik:
     image: docker.io/traefik:${TRAEFIK_RELEASE:-v2.9.8}
-    restart: always
+    restart: ${RESTART_POLICY}
     command:
      - --api.insecure=true
      - --providers.docker=true
@@ -169,6 +176,10 @@ services:
       - traefik:/letsencrypt:rw
       - /run/docker.sock:/var/run/docker.sock:ro
 volumes:
+  mattermost_data:
+    driver: local
+  prostrges_data:
+    driver: local
   e1_data:
     driver: local
   e2_data:
@@ -176,8 +187,6 @@ volumes:
   e3_data:
     driver: local
   support_data:
-    driver: local
-  mongodb_data:
     driver: local
 #  isoflow_data:
 #    driver: local

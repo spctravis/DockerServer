@@ -21,8 +21,8 @@ services:
       ROOT_URL: https://chat.badger.lan
       PORT: ${PORT:-3000}
       DEPLOY_METHOD: docker
-      DEPLOY_PLATFORM: ${DEPLOY_PLATFORM:-}
-      REG_TOKEN: ${REG_TOKEN:-}
+      #DEPLOY_PLATFORM: ${DEPLOY_PLATFORM:-}
+      #REG_TOKEN: ${REG_TOKEN:-}
       INITIAL_USER: yes
       ADMIN_USERNAME: admin
       ADMIN_NAME: Admin
