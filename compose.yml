@@ -33,6 +33,10 @@ services:
     read_only: ${MATTERMOST_CONTAINER_READONLY}
     tmpfs:
       - /tmp
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.manager.rule: Host(`chat.badger.lan`)
+      traefik.http.routers.manager.entryPoints: web  
     volumes:
       - ${MATTERMOST_CONFIG_PATH}:/mattermost/config:rw
       - ${MATTERMOST_DATA_PATH}:/mattermost/data:rw
