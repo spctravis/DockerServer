@@ -62,15 +62,19 @@ services:
       # additional settings
       - MM_SERVICESETTINGS_SITEURL
 
-  # netmap:
-  #  image: markmanx/isoflow:latest
-  #  restart: always
-  #  ports:
-  #    - 3001:3001
-  #  environment:
-  #    - VIRTUAL_HOST=netmap.badger.lan
-  #  volumes:
-  #    - isoflow_data:/opt/isoflow/data
+  netmap:
+    image: markmanx/isoflow:latest
+    restart: ${RESTART_POLICY}
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.manager.rule: Host(`networkmap.badger.lan`)
+      traefik.http.routers.manager.entryPoints: web
+    ports:
+      - 3001:3001
+    environment:
+      - VIRTUAL_HOST=networkmap.badger.lan
+    volumes:
+      - isoflow_data:/opt/isoflow/data
 
   manager:
     image: portainer/portainer-ce:latest
