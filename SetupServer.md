@@ -11,7 +11,7 @@ sudo apt-get update
 Next, install Docker.
 
 ```bash
-sudo apt-get install docker.io
+# sudo apt-get install docker.io
 ```
 
 ## Step 3: Start and Automate Docker

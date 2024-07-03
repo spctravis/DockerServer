@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Pull the Etherpad Docker image
-docker pull etherpad/etherpad
+sudo docker pull etherpad/etherpad
 
 # Create directories for Etherpad
 mkdir -p /opt/etherpad-lite/var
